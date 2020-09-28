@@ -10,5 +10,33 @@ async def on_ready():
 @client.command()
 async def hi(ctx):
     await ctx.send("hi")
+@client.command(aliases=["whois"])
+async def userinfo(ctx, member: discord.Member = None):
+    if not member:  
+        member = ctx.message.author  
+    roles = [role for role in member.roles]
+    embed = discord.Embed(colour=discord.Colour.purple(), timestamp=ctx.message.created_at,
+                          title=f"User Info - {member}")
+    embed.set_thumbnail(url=member.avatar_url)
+    embed.set_footer(text=f"Requested by {ctx.author}")
+
+    embed.add_field(name="ID:", value=member.id)
+    embed.add_field(name="Display Name:", value=member.display_name)
+
+    embed.add_field(name="Created Account On:", value=member.created_at.strftime("%a, %#d %B %Y, %I:%M %p UTC"))
+    embed.add_field(name="Joined Server On:", value=member.joined_at.strftime("%a, %#d %B %Y, %I:%M %p UTC"))
+
+    embed.add_field(name="Roles:", value="".join([role.mention for role in roles]))
+    embed.add_field(name="Highest Role:", value=member.top_role.mention)
+    print(member.top_role.mention)
+    await ctx.send(embed=embed)
+ async def ban(ctx, member : discord.Member, reason=None):
+    """Bans a user"""
+    if reason == None:
+        await ctx.send(f"Woah {ctx.author.mention}, Make sure you provide a reason!")
+    else:
+        messageok = f"You have been banned from {ctx.guild.name} for {reason}"
+        await member.send(messageok)
+        await member.ban(reason=reason)
 
 @client.run("token")
